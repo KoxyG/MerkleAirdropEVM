@@ -45,7 +45,8 @@ This will generate a CSV file with random data saved as csvFile.csv and save it 
 
 ```bash
 npx hardhat run scripts/merkle.ts --network lisk-sepolia
-```bash
+```
+
 Running this script will generate the merkleTree.json file, addressData.json file and also output the merkleRoot in your console.
 
 ## Folder Structure
