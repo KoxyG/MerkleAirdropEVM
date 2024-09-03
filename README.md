@@ -35,3 +35,23 @@ MerkleAirdropEVM is an Ethereum-based airdrop mechanism utilizing a Merkle tree 
 ```bash
 npx hardhat run scripts/generateCSV.ts --network lisk-sepolia
 ```
+This will generate a CSV file with random data saved as csvFile.csv and save it in the scripts/Data folder.
+
+2. Merkle Tree Airdrop:
+
+- Once the CSV file is generated, you can proceed with running the merklejs script by running the following command.
+
+```bash
+npx hardhat run scripts/merkle.ts --network lisk-sepolia
+```bash
+Running this script will generate the merkleTree.json file, addressData.json file and also output the merkleRoot in your console.
+
+## Folder Structure
+- contracts/: Contains the smart contracts for the Merkle airdrop.
+- scripts/: Contains the script to generate the random CSV files.
+- scripts/Data/: The directory where the generated CSV files are saved.
+- test/: Contains test cases for the smart contracts.
+
+## Merkle Root & Token Address
+- Merkle Root: `0x511302a30fbffc89804cecbeaac285fd42525c99b5addcd79b4bb0fa252c3a56`
+- Token Address: `0x4dBCD8721e025EE11B8b1Fa4991dA993e202A0b5`
