@@ -4,6 +4,8 @@ pragma solidity ^0.8.24;
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
+import "./IERC20.sol";
+
 
 contract MerkleAirdrop is ERC20 {
      
@@ -23,9 +25,13 @@ contract MerkleAirdrop is ERC20 {
     event OwnerWithdraw(address indexed to, uint256 amount);
     event RootUpdated(address);
 
-    constructor(string memory _name, string memory _symbol, bytes32 _merkleRoot) ERC20(_name, _symbol) {
+    
+    IERC20 public rewardToken;
+
+    constructor(address _rewardToken, bytes32 _merkleRoot) {
         merkleRoot = _merkleRoot;
         owner = msg.sender;
+        rewardToken = IERC20(_rewardToken);
     }
 
     function claim(uint256 _amount, bytes32[] calldata proof) external returns (bool success) {
@@ -38,7 +44,7 @@ contract MerkleAirdrop is ERC20 {
         if (!isValidLeaf) revert NotInMerkle();
 
         hasClaimed[msg.sender] = true;
-        _mint(msg.sender, _amount);
+        rewardToken.transfer(msg.sender, amount);
 
         // Emit claim event
         emit Claim(msg.sender, _amount);
@@ -54,7 +60,7 @@ contract MerkleAirdrop is ERC20 {
         if (contractBalance <= amount) revert NotEnoughBalance();
 
         // Transfer the tokens to the owner
-        transfer(msg.sender, amount);
+        rewardToken.transfer(msg.sender, amount);
 
         // Emit withdraw event
         emit OwnerWithdraw(msg.sender, amount);
