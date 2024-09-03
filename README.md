@@ -17,13 +17,15 @@ MerkleAirdropEVM is an Ethereum-based airdrop mechanism utilizing a Merkle tree 
 
 1. Clone the repository:
 
-   ```bash
-   git clone https://github.com/yourusername/MerkleAirdropEVM.git
-   cd MerkleAirdropEVM
-```
-2. Install dependencies:
 ```bash
-    npm install
+git clone https://github.com/yourusername/MerkleAirdropEVM.git
+cd MerkleAirdropEVM
+```
+
+2. Install dependencies:
+
+```bash
+npm install
 ```
 
 ## Usage
