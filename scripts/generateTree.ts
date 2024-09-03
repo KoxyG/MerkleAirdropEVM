@@ -14,12 +14,12 @@ export interface AddressProof {
 
 export interface Data {
   amount?: any;
-  tokenId: number;
   address: string;
 }
 
-const csvfile = path.join(__dirname, "data2.csv");
+const csvfile = path.join(__dirname, "Data/csvFile.csv");
 
+// generate merkle tree
 async function generateMerkleTree(csvFilePath: string): Promise<void> {
   const data: Data[] = [];
 
@@ -35,11 +35,12 @@ async function generateMerkleTree(csvFilePath: string): Promise<void> {
   });
   let leaf: string;
   let leaves: string[] = [];
+
   // Hash the data using the Solidity keccak256 function
   for (const row of data) {
     leaf = utils.solidityKeccak256(
-      ["address", "uint256", "uint256"],
-      [row.address, row.tokenId, row.amount]
+      ["address", "uint256"],
+      [row.address, row.amount]
     );
     leaves.push(leaf);
   }
@@ -57,7 +58,7 @@ async function generateMerkleTree(csvFilePath: string): Promise<void> {
 
   // Write the Merkle tree and root to a file
   await new Promise<void>((resolve, reject) => {
-    fs.writeFile("merkleTree.json", JSON.stringify(addressProofs), (err) => {
+    fs.writeFile("scripts/Data/merkleTree.json", JSON.stringify(addressProofs), (err) => {
       if (err) {
         reject(err);
       } else {
@@ -73,7 +74,7 @@ async function generateMerkleTree(csvFilePath: string): Promise<void> {
   });
 
   await new Promise<void>((resolve, reject) => {
-    fs.writeFile("addressData.json", JSON.stringify(addressData), (err) => {
+    fs.writeFile("scripts/Data/addressData.json", JSON.stringify(addressData), (err) => {
       if (err) {
         reject(err);
       } else {
@@ -83,6 +84,7 @@ async function generateMerkleTree(csvFilePath: string): Promise<void> {
   });
   console.log("0x" + tree.getRoot().toString("hex"));
 }
+
 
 generateMerkleTree(csvfile).catch((error) => {
   console.error(error);

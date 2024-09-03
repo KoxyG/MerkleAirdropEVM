@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 contract MerkleAirdrop is ERC20 {
      
-    bytes32 public immutable merkleRoot;
+    bytes32 public merkleRoot;
     mapping(address => bool) public hasClaimed;
     address public owner;
 
@@ -21,7 +21,7 @@ contract MerkleAirdrop is ERC20 {
     // events
     event Claim(address indexed to, uint256 amount);
     event OwnerWithdraw(address indexed to, uint256 amount);
-    event RootUpdated(address)
+    event RootUpdated(address);
 
     constructor(string memory _name, string memory _symbol, bytes32 _merkleRoot) ERC20(_name, _symbol) {
         merkleRoot = _merkleRoot;
@@ -50,10 +50,8 @@ contract MerkleAirdrop is ERC20 {
         if (msg.sender != owner) revert NotOwner();
 
         // Ensure the contract has enough tokens to withdraw
-        uint256 contractBalance = balanceOf(address(this));
-        require(contractBalance >= amount, "Insufficient contract balance");
-        
-        if (!contractBalance >= amount) revert NotEnoughBalance();
+        uint256 contractBalance = balanceOf(address(this));    
+        if (contractBalance <= amount) revert NotEnoughBalance();
 
         // Transfer the tokens to the owner
         transfer(msg.sender, amount);

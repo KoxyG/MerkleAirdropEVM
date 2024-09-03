@@ -38,7 +38,7 @@ function convertToCSV(data: { address: string|null, amount : number }[]): string
 
 // Write data to a CSV file
 function writeCSV(data: string): void {
-    fs.writeFile('data2.csv', data, (err) => {
+    fs.writeFile('scripts/Data/csvFile.csv', data, (err) => {
         if (err) {
             console.error('Error writing to CSV:', err);
         } else {
