@@ -1,6 +1,4 @@
 import * as fs from 'fs';
-// import { utils } from "ethers";
-
 import { ethers } from 'ethers';
 
 
