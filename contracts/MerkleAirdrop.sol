@@ -8,16 +8,19 @@ contract MerkleAirdrop is ERC20 {
      
     bytes32 public immutable merkleRoot;
     mapping(address => bool) public hasClaimed;
+    address public owner;
 
     // errors 
     error AlreadyClaimed();
     error NotInMerkle();
+    error NotOwner();
 
     // events
     event Claim(address indexed to, uint256 amount);
 
     constructor(string memory _name, string memory _symbol, bytes32 _merkleRoot) ERC20(_name, _symbol) {
         merkleRoot = _merkleRoot;
+        owner = msg.sender;
     }
 
     function claim(uint256 _amount, bytes32[] calldata proof) external returns (bool success) {
@@ -36,5 +39,11 @@ contract MerkleAirdrop is ERC20 {
         emit Claim(msg.sender, _amount);
 
         return true;
+    }
+
+    function withdraw(uint256 amount) external {
+        if (msg.sender != owner) revert NotOwner();
+
+        
     }
 }
