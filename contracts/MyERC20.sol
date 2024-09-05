@@ -7,14 +7,13 @@ contract MyERC20 is ERC20 {
 
     address public owner;
 
-    error NotOwner();
-
     constructor() ERC20("MyERC20", "MY") {
         owner = msg.sender;
+         _mint(msg.sender, 10000e18);
+
     }
 
-    function mint(address to, uint256 amount) external {
-        if (msg.sender != owner) revert NotOwner();
+    function mint(address to, uint256 amount) internal {
         _mint(to, amount);
     }
 

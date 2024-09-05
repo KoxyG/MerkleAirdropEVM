@@ -56,7 +56,7 @@ npx hardhat ignition deploy ignition/modules/MyERC20.ts --network lisk-sepolia
 After deploying the token contract, saved the address somewhere for it will be used to deploy the merkle contract. 
 PS: Make sure you change the tokenAddress and the merkleRoot address in the deploy script!.
 
-- Deploy thr Merkle contract by using this command:
+- Deploy the Merkle contract by using this command:
 ```bash
 npx hardhat ignition deploy ignition/modules/merkle.ts --network lisk-sepolia
 ```

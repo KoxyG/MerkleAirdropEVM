@@ -80,8 +80,8 @@ contract MerkleAirdrop {
     }
 
 
-    function getContractBalance() external returns(uint) {
-       return rewardToken.balanceOf(address(this))
+    function getContractBalance() external view returns(uint) {
+       return rewardToken.balanceOf(address(this));
     }
 
 }
