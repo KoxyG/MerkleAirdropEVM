@@ -22,7 +22,7 @@ contract MerkleAirdrop {
     // events
     event Claim(address indexed to, uint256 amount);
     event OwnerWithdraw(address indexed to, uint256 amount);
-    event RootUpdated(address);
+    event RootUpdated(address indexed owner, bytes32 newRoot);
 
     
     IERC20 public rewardToken;
@@ -75,7 +75,7 @@ contract MerkleAirdrop {
         if (msg.sender != owner) revert NotOwner();
         
         merkleRoot = _merkleRoot;
-
+        emit RootUpdated(msg.sender, _merkleRoot);
         return true;
     }
 
