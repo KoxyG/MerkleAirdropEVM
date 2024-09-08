@@ -36,21 +36,22 @@ contract MerkleAirdrop {
 
 
 
-    function claim(uint256 _amount, bytes32[] calldata proof) external returns (bool success) {
-        if (hasClaimed[msg.sender]) revert AlreadyClaimed();
+    function claim(uint256 _amount, address _claimer, bytes32[] calldata proof) external returns (bool success) {
+        
+        if (hasClaimed[_claimer]) revert AlreadyClaimed();
 
         // generate leaf
-        bytes32 leaf = keccak256(abi.encodePacked(msg.sender, _amount));
+        bytes32 leaf = keccak256(abi.encodePacked(_claimer, _amount));
         // Verify merkle proof, or revert if not in tree
         bool isValidLeaf = MerkleProof.verify(proof, merkleRoot, leaf);
 
         if (!isValidLeaf) revert NotInMerkle();
 
-        hasClaimed[msg.sender] = true;
-        rewardToken.transfer(msg.sender, _amount);
+        hasClaimed[_claimer] = true;
+        rewardToken.transfer(_claimer, _amount);
 
         // Emit claim event
-        emit Claim(msg.sender, _amount);
+        emit Claim(_claimer, _amount);
 
         return true;
     }

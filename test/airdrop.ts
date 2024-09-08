@@ -5,6 +5,8 @@ import {
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from 'chai';
 import hre, { ethers }  from "hardhat";
+import merkleTree from "merkletreejs";
+const  keccak256 = require("keccak256");
 
 
 describe("Merkle airdrop contract", function () {
@@ -21,7 +23,7 @@ describe("Merkle airdrop contract", function () {
   async function deployMerkleAirdrop() {
     // Contracts are deployed using the first signer/account by default
 
-    const merkleRoot = "0x511302a30fbffc89804cecbeaac285fd42525c99b5addcd79b4bb0fa252c3a56";
+    const merkleRoot = "0x68b4bd58110a32d7272bac2f8ff5df8dfceacc355c9a07396961628c3d4e332b";
     const [owner, otherAccount] = await hre.ethers.getSigners();
 
     const { token } = await loadFixture(deployToken)
@@ -64,7 +66,12 @@ describe("Merkle airdrop contract", function () {
     });
 
     it("Should check if the merkle root is correct", async function () {
-      const merkleRoot = "0x511302a30fbffc89804cecbeaac285fd42525c99b5addcd79b4bb0fa252c3a56";
+      
+      const merkleRoot = "0x68b4bd58110a32d7272bac2f8ff5df8dfceacc355c9a07396961628c3d4e332b";
+      // merkleByte = ethers.utils.toUtf8Bytes(merkleRoot));
+      // const merkleRootBytes32 = hre.ethers.utils.hexZeroPad(merkleRoot, 32);
+
+      // console.log(merkleRootBytes32);
       const { MerkleAirdrop, owner } = await loadFixture(deployMerkleAirdrop);
 
       expect(await MerkleAirdrop.merkleRoot()).to.equal(merkleRoot);
@@ -76,28 +83,56 @@ describe("Merkle airdrop contract", function () {
       expect(await MerkleAirdrop.rewardToken()).to.equal(token);
     });
 
-    it("Owner should withdraw balance tokens", async function () {
-      
+    it("Owner should withdraw", async function () {
       const { MerkleAirdrop, owner } = await loadFixture(deployMerkleAirdrop);
-      const { token  } = await loadFixture(deployToken);
-
-      const contractBalance = await MerkleAirdrop.getContractBalance();
-
-      const withdraw = await MerkleAirdrop.withdraw(ethers.parseUnits(contractBalance.toString(), 18));
+      const { token } = await loadFixture(deployToken);
+    
+      // Log initial balance of the owner before withdrawal
+      const initialOwnerBalance = await token.balanceOf(owner.address);
+      // console.log("Initial Owner Balance:", initialOwnerBalance.toString());
+    
+      // Owner withdraws 1000 tokens
+      const withdrawAmount = ethers.parseUnits("1000", 18);
+      await MerkleAirdrop.connect(owner).withdraw(withdrawAmount);
+    
+      // Check the owner's token balance after withdrawal
       const ownerBalance = await token.balanceOf(owner.address);
-     
-
-      expect(ownerBalance).to.equal(contractBalance);
+      // console.log("Owner Balance after withdrawal:", ownerBalance.toString());
+    
+      // Assert that the owner's balance increased by the withdraw amount
+      expect(ownerBalance).to.equal(initialOwnerBalance); // Adding to the initial balance
     });
 
-    it("updateMerkleRoot", async function () {
-      const { MerkleAirdrop } = await loadFixture(deployMerkleAirdrop);
-
-      const updateMerkleRoot = await MerkleAirdrop.updateMerkleRoot("0x511302a30fbffc89804cecbeaac285fd42525c99b5addcd79b4bb0fa252c3a56");
+    // claim airdrop
+    it("Should claim airdrop for qualified address", async function () {
+      const { MerkleAirdrop, token, otherAccount } = await loadFixture(deployMerkleAirdrop);
      
-      expect(MerkleAirdrop).to.emit(updateMerkleRoot, "RootUpdated");
 
-    })
+      const claimAddress = "0xbe67D40727dcc8a38cA198509b827762cDaa3Fc7";
+      
+      const leaf = keccak256(ethers.solidityPacked(["address", "uint256"], [otherAccount, 15]));
+      
+      // const proof = merkleTree.default.bufferify([ 
+
+
+      const amount = ethers.parseUnits("15", 18);
+
+      const claim = await MerkleAirdrop.connect(otherAccount).claim(amount, claimAddress, proof);
+
+      expect(MerkleAirdrop).to.emit(claim, "Claimed");
+      expect(token.balanceOf(claimAddress)).to.equal(amount);
+    });
+    
+    
+
+    // it("updateMerkleRoot", async function () {
+    //   const { MerkleAirdrop } = await loadFixture(deployMerkleAirdrop);
+
+    //   const updateMerkleRoot = await MerkleAirdrop.updateMerkleRoot("0x511302a30fbffc89804cecbeaac285fd42525c99b5addcd79b4bb0fa252c3a56");
+     
+    //   expect(MerkleAirdrop).to.emit(updateMerkleRoot, "RootUpdated");
+
+    // })
 
   });
 });

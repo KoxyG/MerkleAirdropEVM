@@ -70,5 +70,5 @@ Running this script will generate the merkleTree.json file, addressData.json fil
 - test/: Contains test cases for the smart contracts.
 
 ## Merkle Root & Token Address
-- Merkle Root: `0x511302a30fbffc89804cecbeaac285fd42525c99b5addcd79b4bb0fa252c3a56`
+- Merkle Root: `0x68b4bd58110a32d7272bac2f8ff5df8dfceacc355c9a07396961628c3d4e332b`
 - Token Address: `0x4dBCD8721e025EE11B8b1Fa4991dA993e202A0b5`

@@ -1,8 +1,8 @@
 import MerkleTree from "merkletreejs";
-import { keccak256 } from "ethers/lib/utils";
+const  keccak256 = require("keccak256");
 import csv from "csv-parser";
 import * as fs from "fs";
-import { utils } from "ethers";
+// import { utils } from "ethers";
 import path from "path";
 
 //This might not be used
@@ -20,7 +20,7 @@ export interface Data {
 const csvfile = path.join(__dirname, "Data/csvFile.csv");
 
 // generate merkle tree
-async function generateMerkleTree(csvFilePath: string): Promise<void> {
+async function generateMerkleRoot(csvFilePath: string): Promise<void> {
   const data: Data[] = [];
 
   // Read the CSV file and store the data in an array
@@ -33,60 +33,28 @@ async function generateMerkleTree(csvFilePath: string): Promise<void> {
       .on("end", resolve)
       .on("error", reject);
   });
-  let leaf: string;
-  let leaves: string[] = [];
 
-  // Hash the data using the Solidity keccak256 function
-  for (const row of data) {
-    leaf = utils.solidityKeccak256(
-      ["address", "uint256"],
-      [row.address, row.amount]
-    );
-    leaves.push(leaf);
-  }
+ 
+  // convert to a leaves array
+  const leaves = data.map((row) => {
+    const combinedData = `${row.address}:${row.amount}`; // Adjust this based on your CSV structure
+    return keccak256(combinedData); // Hash the combined data using keccak256
+  });
+  
 
-  // Create the Merkle tree
+ 
+
+  // Create the Merkle root
   const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
-  const addressProofs: { [address: string]: AddressProof } = {};
-  data.forEach((row, index) => {
-    const proof = tree.getProof(leaves[index]);
-    addressProofs[row.address] = {
-      leaf: "0x" + leaves[index].toString(),
-      proof: proof.map((p) => "0x" + p.data.toString("hex")),
-    };
-  });
+  const  root = tree.getHexRoot();
+  console.log("Merkle root:", root);
 
-  // Write the Merkle tree and root to a file
-  await new Promise<void>((resolve, reject) => {
-    fs.writeFile("scripts/Data/merkleTree.json", JSON.stringify(addressProofs), (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
 
-  // Write a JSON object mapping addresses to data to a file
-  const addressData: { [address: string]: Data } = {};
-  data.forEach((row) => {
-    addressData[row.address] = row;
-  });
 
-  await new Promise<void>((resolve, reject) => {
-    fs.writeFile("scripts/Data/addressData.json", JSON.stringify(addressData), (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
-  console.log("0x" + tree.getRoot().toString("hex"));
 }
 
 
-generateMerkleTree(csvfile).catch((error) => {
+generateMerkleRoot(csvfile).catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
